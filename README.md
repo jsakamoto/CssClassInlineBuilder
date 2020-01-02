@@ -1,4 +1,8 @@
-# CSS Class Inline Builder
+# CSS Class Inline Builder (designed for Blazor)
+
+## Summary
+
+Build CSS class names for "class" attribute dynamically in Razor files in-line.
 
 ## License
 
