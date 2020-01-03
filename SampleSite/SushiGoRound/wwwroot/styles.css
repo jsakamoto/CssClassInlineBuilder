@@ -1,0 +1,56 @@
+﻿body {
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 22px;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    margin: 0;
+    font-weight: normal;
+    font-size: 44px;
+    text-align: center;
+    height: 60px;
+}
+
+p {
+    text-align: center;
+    margin: 10px 0;
+}
+
+.sushi {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    width: 300px;
+    height: 300px;
+    line-height: 300px;
+    text-align: center;
+    font-size: 200px;
+    transform: rotate(0);
+    transition: all linear 0.2s;
+    pointer-events: none;
+}
+
+    .sushi.rotate {
+        animation: rotate 5s linear;
+        animation-iteration-count: infinite;
+    }
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.sushi.disabled {
+    filter: grayscale(1);
+    opacity: 0.5;
+}

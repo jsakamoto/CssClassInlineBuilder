@@ -12,7 +12,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CssClassInlineBuilder.Test"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CssClassInlineBuilder", "CssClassInlineBuilder\CssClassInlineBuilder.csproj", "{D852608B-6F03-41A6-BF36-F93E44A2BDC0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleSite", "SampleSite\SampleSite.csproj", "{F218E39E-8368-4E18-93FA-96153EE962EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SushiGoRound", "SampleSite\SushiGoRound\SushiGoRound.csproj", "{AF6F6D49-7BF3-4C64-818B-1F815281CE5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,10 +28,10 @@ Global
 		{D852608B-6F03-41A6-BF36-F93E44A2BDC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D852608B-6F03-41A6-BF36-F93E44A2BDC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D852608B-6F03-41A6-BF36-F93E44A2BDC0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F218E39E-8368-4E18-93FA-96153EE962EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F218E39E-8368-4E18-93FA-96153EE962EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F218E39E-8368-4E18-93FA-96153EE962EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F218E39E-8368-4E18-93FA-96153EE962EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF6F6D49-7BF3-4C64-818B-1F815281CE5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF6F6D49-7BF3-4C64-818B-1F815281CE5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF6F6D49-7BF3-4C64-818B-1F815281CE5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF6F6D49-7BF3-4C64-818B-1F815281CE5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

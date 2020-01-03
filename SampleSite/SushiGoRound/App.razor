@@ -1,0 +1,23 @@
+﻿@using static Toolbelt.Web.CssClassInlineBuilder
+
+<h1>Welcome to shusi-go-round Blazor App</h1>
+
+<p>
+    Inspired by <a href="https://github.com/EndoHizumi/sushi-go-round" target="_blank">"Sushi-go-round"</a>
+</p>
+
+<p>
+    <label><input type="checkbox" @bind="Rotate" />Rotate</label>
+    <label><input type="checkbox" @bind="Disabled" />Disabled</label>
+</p>
+
+<div class="@CssClass("sushi", new {Rotate, Disabled })">
+    🍣
+</div>
+
+@code
+{
+    bool Rotate;
+
+    bool Disabled;
+}
