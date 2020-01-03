@@ -10,7 +10,7 @@ namespace Toolbelt.Web
 {
     public static class CssClassInlineBuilder
     {
-        public static string classes(params object[] args)
+        public static string CssClass(params object[] args)
         {
             Builder.Clear();
             var _1st = true;
