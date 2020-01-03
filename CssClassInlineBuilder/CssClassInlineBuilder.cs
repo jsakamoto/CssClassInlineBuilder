@@ -68,26 +68,28 @@ namespace Toolbelt.Web
                 return cache.PropGetters;
             }
 
-            if (Interlocked.Increment(ref CountOfCache) >= GCThreshold)
-            {
-                lock (Cache)
-                {
-                    var toRemoves = Cache.OrderByDescending(kv => kv.Value.Gen).Skip(GCKeepSize).ToArray();
-                    foreach (var toRemove in toRemoves)
-                    {
-                        Cache.TryRemove(toRemove.Key, out var _);
-                        Interlocked.Decrement(ref CountOfCache);
-                    }
-                }
-            }
-
             var boolPropNamesAndGetters = type.GetProperties()
                 .Where(p => p.PropertyType == typeof(bool))
                 .Select(p => (Name: GetHyphenatedName(p.Name), Getter: p.GetGetMethod()))
                 .ToArray();
             var newCache = new CacheEntry(boolPropNamesAndGetters);
             newCache.Gen = Interlocked.Increment(ref Gen);
-            Cache.TryAdd(type, newCache);
+
+            if (Cache.TryAdd(type, newCache))
+            {
+                if (Interlocked.Increment(ref CountOfCache) >= GCThreshold)
+                {
+                    lock (Cache)
+                    {
+                        var toRemoves = Cache.OrderByDescending(kv => kv.Value.Gen).Skip(GCKeepSize).ToArray();
+                        foreach (var toRemove in toRemoves)
+                        {
+                            if (Cache.TryRemove(toRemove.Key, out var _))
+                                Interlocked.Decrement(ref CountOfCache);
+                        }
+                    }
+                }
+            }
 
             return newCache.PropGetters;
         }
