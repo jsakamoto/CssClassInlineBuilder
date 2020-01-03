@@ -6,15 +6,22 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(MSBuildProjectName).xml</DocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <Copyright>Copyright © 2020 J.Sakamoto, Mozilla Public License 2.0</Copyright>
     <Authors>J.Sakamoto</Authors>
-    <Version>1.0.0.1</Version>
+    <Version>1.0.0.2</Version>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <AssemblyName>Toolbelt.Web.CssClassInlineBuilder</AssemblyName>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <PackageOutputPath>..\_dist\</PackageOutputPath>
+    <Description>Build CSS class string for "class" attribute dynamically based on boolean switch values, in Razor files in-line. (designed for "Blazor")</Description>
+    <PackageTags>blazor,cssclasses,cssclass,razor</PackageTags>
+    <PackageProjectUrl>https://github.com/jsakamoto/CssClassInlineBuilder</PackageProjectUrl>
+    <PackageReleaseNotes>
+      v.1.0.0
+      - 1st release.
+    </PackageReleaseNotes>
   </PropertyGroup>
 
 </Project>

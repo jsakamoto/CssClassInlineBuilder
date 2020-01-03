@@ -8,8 +8,14 @@ using System.Threading;
 
 namespace Toolbelt.Web
 {
+    /// <summary>
+    /// Build CSS class string for "class" attribute dynamically based on boolean switch values.
+    /// </summary>
     public static class CssClassInlineBuilder
     {
+        /// <summary>
+        /// Build CSS class string from boolean properties of objects in arguments, from strings in arguments.
+        /// </summary>
         public static string CssClass(params object[] args)
         {
             Builder.Clear();
