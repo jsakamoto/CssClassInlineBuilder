@@ -28,6 +28,12 @@ namespace Toolbelt.Web
                     _1st = false;
                     Builder.Append(s);
                 }
+                else if (arg is Enum e)
+                {
+                    if (!_1st) Builder.Append(' ');
+                    _1st = false;
+                    Builder.Append(GetHyphenatedName(e.ToString()));
+                }
                 else
                 {
                     foreach (var (name, getter) in GetPropEntriesFromCache(arg))

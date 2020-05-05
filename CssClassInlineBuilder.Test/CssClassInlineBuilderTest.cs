@@ -19,5 +19,19 @@ namespace Toolbelt.Web.Test
             CssClass(new { Foo = false, Bar = "BAR", Fizz = true, Buzz = 123 })
                 .Is("fizz");
         }
+
+        private enum EnumForTest
+        {
+            Foo,
+            Bar,
+            FizzBuzz
+        }
+
+        [Fact(DisplayName = "classes - Evaluate enum values")]
+        public void Classes_EvaludateEnumlValues_Test()
+        {
+            CssClass(EnumForTest.Foo, EnumForTest.Bar, EnumForTest.FizzBuzz)
+                .Is("foo bar fizz-buzz");
+        }
     }
 }
