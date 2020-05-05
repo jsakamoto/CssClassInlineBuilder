@@ -109,26 +109,29 @@ namespace Toolbelt.Web
         private static string GetHyphenatedName(string baseName)
         {
             var name = baseName;
-            Span<char> buff = stackalloc char[name.Length * 2];
-            var isPrevCharUpperCase = false;
-            var j = 0;
-            foreach (var c in name)
+            unsafe
             {
-                if ('A' <= c && c <= 'Z')
+                char* buff = stackalloc char[name.Length * 2];
+                var isPrevCharUpperCase = false;
+                var j = 0;
+                foreach (var c in name)
                 {
-                    if (!isPrevCharUpperCase && j != 0)
+                    if ('A' <= c && c <= 'Z')
                     {
-                        buff[j++] = '-';
+                        if (!isPrevCharUpperCase && j != 0)
+                        {
+                            buff[j++] = '-';
+                        }
+                        buff[j] = (char)0x20;
+                        isPrevCharUpperCase = true;
                     }
-                    buff[j] = (char)0x20;
-                    isPrevCharUpperCase = true;
+                    else isPrevCharUpperCase = false;
+                    buff[j++] |= c;
                 }
-                else isPrevCharUpperCase = false;
-                buff[j++] |= c;
-            }
 
-            var hyphenatedName = new string(buff.ToArray(), 0, j);
-            return hyphenatedName;
+                var hyphenatedName = new string(buff, 0, j);
+                return hyphenatedName;
+            }
         }
     }
 }
