@@ -19,10 +19,15 @@
     <Description>Build CSS class string for "class" attribute dynamically based on boolean switch values, in Razor files in-line. (designed for "Blazor")</Description>
     <PackageTags>blazor,cssclasses,cssclass,razor</PackageTags>
     <PackageProjectUrl>https://github.com/jsakamoto/CssClassInlineBuilder</PackageProjectUrl>
-    <PackageReleaseNotes>
-      v.1.0.0
-      - 1st release.
-    </PackageReleaseNotes>
+    <PackageReleaseNotes>(Please write the package release notes in "../RELEASE-NOTES.txt".)</PackageReleaseNotes>
   </PropertyGroup>
 
+  <Target Name="PreparePackageReleaseNoteFromFile" BeforeTargets="GenerateNuspec">
+    <ReadLinesFromFile File="../RELEASE-NOTES.txt" >
+      <Output TaskParameter="Lines" ItemName="ReleaseNoteLines"/>
+    </ReadLinesFromFile>
+    <PropertyGroup>
+      <PackageReleaseNotes>@(ReleaseNoteLines, '%0a')</PackageReleaseNotes>
+    </PropertyGroup>
+  </Target>
 </Project>

@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "README", "README", "{F38B7554-1ACE-453D-96A6-5C83D51F3591}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+		RELEASE-NOTES.txt = RELEASE-NOTES.txt
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CssClassInlineBuilder.Test", "CssClassInlineBuilder.Test\CssClassInlineBuilder.Test.csproj", "{85E4629D-F51D-4A32-AF48-8E72FAF215E8}"
