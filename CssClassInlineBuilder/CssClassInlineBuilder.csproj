@@ -20,11 +20,20 @@
     <PackageTags>blazor,cssclasses,cssclass,razor</PackageTags>
     <PackageProjectUrl>https://github.com/jsakamoto/CssClassInlineBuilder</PackageProjectUrl>
     <PackageReleaseNotes>(Please write the package release notes in "../RELEASE-NOTES.txt".)</PackageReleaseNotes>
+    <PackageIcon>nupkg-icon.png</PackageIcon>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="..\assets\nupkg-icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+
   <Target Name="PreparePackageReleaseNoteFromFile" BeforeTargets="GenerateNuspec">
-    <ReadLinesFromFile File="../RELEASE-NOTES.txt" >
-      <Output TaskParameter="Lines" ItemName="ReleaseNoteLines"/>
+    <ReadLinesFromFile File="../RELEASE-NOTES.txt">
+      <Output TaskParameter="Lines" ItemName="ReleaseNoteLines" />
     </ReadLinesFromFile>
     <PropertyGroup>
       <PackageReleaseNotes>@(ReleaseNoteLines, '%0a')</PackageReleaseNotes>
