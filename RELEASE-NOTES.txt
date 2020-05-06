@@ -1,2 +1,6 @@
+v.1.1.0
+- Add enum values support.
+- Improve performance
+
 v.1.0.0
 - 1st release.
