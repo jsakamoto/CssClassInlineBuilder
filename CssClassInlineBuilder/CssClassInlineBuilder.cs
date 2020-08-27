@@ -18,37 +18,44 @@ namespace Toolbelt.Web
         /// </summary>
         public static string CssClass(params object[] args)
         {
-            Builder.Clear();
-            var _1st = true;
-            foreach (var arg in args)
+            var builder = StringBuilderPool.Get();
+            try
             {
-                if (arg is string s)
+                var _1st = true;
+                foreach (var arg in args)
                 {
-                    if (!_1st) Builder.Append(' ');
-                    _1st = false;
-                    Builder.Append(s);
-                }
-                else if (arg is Enum e)
-                {
-                    if (!_1st) Builder.Append(' ');
-                    _1st = false;
-                    Builder.Append(GetHyphenatedName(e.ToString()));
-                }
-                else
-                {
-                    foreach (var (name, getter) in GetPropEntriesFromCache(arg))
+                    if (arg is string s)
                     {
-                        if ((bool)getter.Invoke(arg, null))
+                        if (!_1st) builder.Append(' ');
+                        _1st = false;
+                        builder.Append(s);
+                    }
+                    else if (arg is Enum e)
+                    {
+                        if (!_1st) builder.Append(' ');
+                        _1st = false;
+                        builder.Append(GetHyphenatedName(e.ToString()));
+                    }
+                    else
+                    {
+                        foreach (var (name, getter) in GetPropEntriesFromCache(arg))
                         {
-                            if (!_1st) Builder.Append(' ');
-                            _1st = false;
-                            Builder.Append(name);
+                            if ((bool)getter.Invoke(arg, null))
+                            {
+                                if (!_1st) builder.Append(' ');
+                                _1st = false;
+                                builder.Append(name);
+                            }
                         }
                     }
                 }
-            }
 
-            return Builder.ToString();
+                return builder.ToString();
+            }
+            finally
+            {
+                StringBuilderPool.Return(builder);
+            }
         }
 
         private class CacheEntry
@@ -67,9 +74,6 @@ namespace Toolbelt.Web
         private static int CountOfCache = 0;
 
         private static ConcurrentDictionary<Type, CacheEntry> Cache = new ConcurrentDictionary<Type, CacheEntry>();
-
-        [ThreadStatic]
-        private static readonly StringBuilder Builder = new StringBuilder();
 
         private static IEnumerable<(string Name, MethodInfo Getter)> GetPropEntriesFromCache(object arg)
         {
@@ -131,6 +135,42 @@ namespace Toolbelt.Web
 
                 var hyphenatedName = new string(buff, 0, j);
                 return hyphenatedName;
+            }
+        }
+    }
+
+    internal static class StringBuilderPool
+    {
+        private static readonly ConcurrentBag<StringBuilder> BuilderPool = new ConcurrentBag<StringBuilder>();
+
+        private static int CountOfBuilder = 0;
+
+        private const int MaxOfBuilder = 10;
+
+        internal static StringBuilder Get()
+        {
+            if (BuilderPool.TryTake(out var builder))
+            {
+                Interlocked.Decrement(ref CountOfBuilder);
+                builder.Clear();
+            }
+            else
+            {
+                builder = new StringBuilder();
+            }
+            return builder;
+        }
+
+        internal static void Return(StringBuilder builder)
+        {
+            var count = Interlocked.Increment(ref CountOfBuilder);
+            if (count <= MaxOfBuilder)
+            {
+                BuilderPool.Add(builder);
+            }
+            else
+            {
+                Interlocked.Decrement(ref CountOfBuilder);
             }
         }
     }
