@@ -16,7 +16,7 @@ namespace Toolbelt.Web.Test
         [Fact(DisplayName = "classes - Evaluate bool values")]
         public void Classes_EvaludateBoolValues_Test()
         {
-            CssClass(new { Foo = false, Bar = "BAR", Fizz = true, Buzz = 123 })
+            CssClass(new { Foo = false, Fizz = true })
                 .Is("fizz");
         }
 
@@ -32,6 +32,17 @@ namespace Toolbelt.Web.Test
         {
             CssClass(EnumForTest.Foo, EnumForTest.Bar, EnumForTest.FizzBuzz)
                 .Is("foo bar fizz-buzz");
+        }
+
+        [Fact(DisplayName = "classes - any other values in members of an object")]
+        public void Classes_AnyOtherValues_in_Members_of_an_Object_Test()
+        {
+            CssClass(new { ActionState = EnumForTest.Foo })
+                .Is("action-state-foo");
+            CssClass(new { ItsBad = false, ActionState = EnumForTest.FizzBuzz, NumberOfStars = 5 })
+                .Is("action-state-fizz-buzz number-of-stars-5");
+            CssClass(new { ItsBad = true, ActionState = EnumForTest.Bar, Theme = "Crystal Blue" })
+                .Is("its-bad action-state-bar theme-crystal-blue");
         }
     }
 }

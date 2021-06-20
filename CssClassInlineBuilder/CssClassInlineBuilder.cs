@@ -38,13 +38,23 @@ namespace Toolbelt.Web
                     }
                     else
                     {
-                        foreach (var (name, getter) in GetPropEntriesFromCache(arg))
+                        foreach (var (name, getter, isBool) in GetPropEntriesFromCache(arg))
                         {
-                            if ((bool)getter.Invoke(arg, null))
+                            if (isBool)
+                            {
+                                if ((bool)getter.Invoke(arg, null))
+                                {
+                                    if (!_1st) builder.Append(' ');
+                                    _1st = false;
+                                    builder.Append(name);
+                                }
+                            }
+                            else
                             {
                                 if (!_1st) builder.Append(' ');
                                 _1st = false;
-                                builder.Append(name);
+                                var value = getter.Invoke(arg, null);
+                                builder.Append(name + "-" + GetHyphenatedName(value.ToString()));
                             }
                         }
                     }
@@ -61,8 +71,8 @@ namespace Toolbelt.Web
         private class CacheEntry
         {
             public long Gen;
-            public readonly IEnumerable<(string Name, MethodInfo Getter)> PropGetters;
-            public CacheEntry((string Name, MethodInfo Getter)[] propGetters) { PropGetters = propGetters; }
+            public readonly IEnumerable<(string Name, MethodInfo Getter, bool IsBool)> PropGetters;
+            public CacheEntry((string Name, MethodInfo Getter, bool IsBool)[] propGetters) { PropGetters = propGetters; }
         }
 
         private const int GCThreshold = 100;
@@ -75,7 +85,7 @@ namespace Toolbelt.Web
 
         private static ConcurrentDictionary<Type, CacheEntry> Cache = new ConcurrentDictionary<Type, CacheEntry>();
 
-        private static IEnumerable<(string Name, MethodInfo Getter)> GetPropEntriesFromCache(object arg)
+        private static IEnumerable<(string Name, MethodInfo Getter, bool IsBool)> GetPropEntriesFromCache(object arg)
         {
             var type = arg.GetType();
             if (Cache.TryGetValue(type, out var cache))
@@ -84,11 +94,10 @@ namespace Toolbelt.Web
                 return cache.PropGetters;
             }
 
-            var boolPropNamesAndGetters = type.GetProperties()
-                .Where(p => p.PropertyType == typeof(bool))
-                .Select(p => (Name: GetHyphenatedName(p.Name), Getter: p.GetGetMethod()))
+            var propNamesAndGetters = type.GetProperties()
+                .Select(p => (Name: GetHyphenatedName(p.Name), Getter: p.GetGetMethod(), IsBool: p.PropertyType == typeof(bool)))
                 .ToArray();
-            var newCache = new CacheEntry(boolPropNamesAndGetters);
+            var newCache = new CacheEntry(propNamesAndGetters);
             newCache.Gen = Interlocked.Increment(ref Gen);
 
             if (Cache.TryAdd(type, newCache))
@@ -118,8 +127,23 @@ namespace Toolbelt.Web
                 char* buff = stackalloc char[name.Length * 2];
                 var isPrevCharUpperCase = false;
                 var j = 0;
-                foreach (var c in name)
+                for (var i = 0; i < name.Length; i++)
                 {
+                    var c = name[i];
+
+                    if (c == ' ')
+                    {
+                        if (i + 1 < name.Length)
+                        {
+                            c = name[++i];
+                            if ('a' <= c && c <= 'z')
+                            {
+                                c = (char)(((byte)c) & ~0x20);
+                            }
+                        }
+                        else continue;
+                    }
+
                     if ('A' <= c && c <= 'Z')
                     {
                         if (!isPrevCharUpperCase && j != 0)
