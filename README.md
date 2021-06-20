@@ -80,7 +80,7 @@ The property name will be converted from camel case/snake case naming convention
   ...
 ```
 
-### 3-3. any other type properties in an object
+#### 3-3. any other type properties in an object
 
 If you pass an object with non-boolean type properties, a CSS class name will be built for each of those properties.  
 That CSS class name will be concatenated with a hyphen of the property name and its property value.
@@ -95,7 +95,7 @@ That CSS class name will be concatenated with a hyphen of the property name and 
 <!-- You will be got `class="number-of-stars-5"` -->
 ```
 
-### 3-4. enum values
+#### 3-4. enum values
 
 You can also pass any number of enum values to the arguments of the `CssClass()` method.
 
