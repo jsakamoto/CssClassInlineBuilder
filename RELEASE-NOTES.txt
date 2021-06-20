@@ -1,3 +1,6 @@
+v.2.0.0
+- [Breaking Change] Add support for non-boolean type properties in an object.
+
 v.1.1.1
 - Fix: crashed on the latest version of Blazor Server app.
 

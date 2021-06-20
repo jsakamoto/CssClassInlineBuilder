@@ -80,7 +80,22 @@ The property name will be converted from camel case/snake case naming convention
   ...
 ```
 
-### 3-3. enum values
+### 3-3. any other type properties in an object
+
+If you pass an object with non-boolean type properties, a CSS class name will be built for each of those properties.  
+That CSS class name will be concatenated with a hyphen of the property name and its property value.
+
+```html
+@code {
+  private int Stars = 5;
+  ...
+}
+
+<div class="@CssClass(new {NumberOfStars = this.Stars})">
+<!-- You will be got `class="number-of-stars-5"` -->
+```
+
+### 3-4. enum values
 
 You can also pass any number of enum values to the arguments of the `CssClass()` method.
 
@@ -129,7 +144,7 @@ You can pass mixing strings, objects, and enum values to the argument of the `Cs
 
 ## Notice
 
-The `CssClass()` method uses the .NET CLR "Reflection" feature to parse the object's `bool` property.
+The `CssClass()` method uses the .NET CLR "Reflection" feature to parse the object's properties.
 
 This means that using the `CssClass()` method can degrade performance.
 
