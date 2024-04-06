@@ -1,201 +1,196 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text;
-using System.Threading;
 
-namespace Toolbelt.Web
+namespace Toolbelt.Web;
+
+/// <summary>
+/// Build CSS class string for "class" attribute dynamically based on boolean switch values.
+/// </summary>
+public static class CssClassInlineBuilder
 {
     /// <summary>
-    /// Build CSS class string for "class" attribute dynamically based on boolean switch values.
+    /// Build CSS class string from boolean properties of objects in arguments, from strings in arguments.
     /// </summary>
-    public static class CssClassInlineBuilder
+    public static string CssClass(params object[] args)
     {
-        /// <summary>
-        /// Build CSS class string from boolean properties of objects in arguments, from strings in arguments.
-        /// </summary>
-        public static string CssClass(params object[] args)
+        var builder = StringBuilderPool.Get();
+        try
         {
-            var builder = StringBuilderPool.Get();
-            try
+            var _1st = true;
+            foreach (var arg in args)
             {
-                var _1st = true;
-                foreach (var arg in args)
+                if (arg is string s)
                 {
-                    if (arg is string s)
+                    if (!_1st) builder.Append(' ');
+                    _1st = false;
+                    builder.Append(s);
+                }
+                else if (arg is Enum e)
+                {
+                    if (!_1st) builder.Append(' ');
+                    _1st = false;
+                    builder.Append(GetHyphenatedName(e.ToString()));
+                }
+                else
+                {
+                    foreach (var (name, getter, isBool) in GetPropEntriesFromCache(arg))
                     {
-                        if (!_1st) builder.Append(' ');
-                        _1st = false;
-                        builder.Append(s);
-                    }
-                    else if (arg is Enum e)
-                    {
-                        if (!_1st) builder.Append(' ');
-                        _1st = false;
-                        builder.Append(GetHyphenatedName(e.ToString()));
-                    }
-                    else
-                    {
-                        foreach (var (name, getter, isBool) in GetPropEntriesFromCache(arg))
+                        if (isBool)
                         {
-                            if (isBool)
-                            {
-                                if ((bool)getter.Invoke(arg, null))
-                                {
-                                    if (!_1st) builder.Append(' ');
-                                    _1st = false;
-                                    builder.Append(name);
-                                }
-                            }
-                            else
+                            if ((bool)getter.Invoke(arg, null))
                             {
                                 if (!_1st) builder.Append(' ');
                                 _1st = false;
-                                var value = getter.Invoke(arg, null);
-                                builder.Append(name + "-" + GetHyphenatedName(value.ToString()));
+                                builder.Append(name);
                             }
                         }
-                    }
-                }
-
-                return builder.ToString();
-            }
-            finally
-            {
-                StringBuilderPool.Return(builder);
-            }
-        }
-
-        private class CacheEntry
-        {
-            public long Gen;
-            public readonly IEnumerable<(string Name, MethodInfo Getter, bool IsBool)> PropGetters;
-            public CacheEntry((string Name, MethodInfo Getter, bool IsBool)[] propGetters) { PropGetters = propGetters; }
-        }
-
-        private const int GCThreshold = 100;
-
-        private const int GCKeepSize = 50;
-
-        private static long Gen;
-
-        private static int CountOfCache = 0;
-
-        private static ConcurrentDictionary<Type, CacheEntry> Cache = new ConcurrentDictionary<Type, CacheEntry>();
-
-        private static IEnumerable<(string Name, MethodInfo Getter, bool IsBool)> GetPropEntriesFromCache(object arg)
-        {
-            var type = arg.GetType();
-            if (Cache.TryGetValue(type, out var cache))
-            {
-                cache.Gen = Interlocked.Increment(ref Gen);
-                return cache.PropGetters;
-            }
-
-            var propNamesAndGetters = type.GetProperties()
-                .Select(p => (Name: GetHyphenatedName(p.Name), Getter: p.GetGetMethod(), IsBool: p.PropertyType == typeof(bool)))
-                .ToArray();
-            var newCache = new CacheEntry(propNamesAndGetters);
-            newCache.Gen = Interlocked.Increment(ref Gen);
-
-            if (Cache.TryAdd(type, newCache))
-            {
-                if (Interlocked.Increment(ref CountOfCache) >= GCThreshold)
-                {
-                    lock (Cache)
-                    {
-                        var toRemoves = Cache.OrderByDescending(kv => kv.Value.Gen).Skip(GCKeepSize).ToArray();
-                        foreach (var toRemove in toRemoves)
+                        else
                         {
-                            if (Cache.TryRemove(toRemove.Key, out var _))
-                                Interlocked.Decrement(ref CountOfCache);
+                            if (!_1st) builder.Append(' ');
+                            _1st = false;
+                            var value = getter.Invoke(arg, null);
+                            builder.Append(name + "-" + GetHyphenatedName(value.ToString()));
                         }
                     }
                 }
             }
 
-            return newCache.PropGetters;
+            return builder.ToString();
         }
-
-        private static string GetHyphenatedName(string baseName)
+        finally
         {
-            var name = baseName;
-            unsafe
-            {
-                char* buff = stackalloc char[name.Length * 2];
-                var isPrevCharUpperCase = false;
-                var j = 0;
-                for (var i = 0; i < name.Length; i++)
-                {
-                    var c = name[i];
-
-                    if (c == ' ')
-                    {
-                        if (i + 1 < name.Length)
-                        {
-                            c = name[++i];
-                            if ('a' <= c && c <= 'z')
-                            {
-                                c = (char)(((byte)c) & ~0x20);
-                            }
-                        }
-                        else continue;
-                    }
-
-                    if ('A' <= c && c <= 'Z')
-                    {
-                        if (!isPrevCharUpperCase && j != 0)
-                        {
-                            buff[j++] = '-';
-                        }
-                        buff[j] = (char)0x20;
-                        isPrevCharUpperCase = true;
-                    }
-                    else isPrevCharUpperCase = false;
-                    buff[j++] |= c;
-                }
-
-                var hyphenatedName = new string(buff, 0, j);
-                return hyphenatedName;
-            }
+            StringBuilderPool.Return(builder);
         }
     }
 
-    internal static class StringBuilderPool
+    private class CacheEntry
     {
-        private static readonly ConcurrentBag<StringBuilder> BuilderPool = new ConcurrentBag<StringBuilder>();
+        public long Gen;
+        public readonly IEnumerable<(string Name, MethodInfo Getter, bool IsBool)> PropGetters;
+        public CacheEntry((string Name, MethodInfo Getter, bool IsBool)[] propGetters) { this.PropGetters = propGetters; }
+    }
 
-        private static int CountOfBuilder = 0;
+    private const int GCThreshold = 100;
 
-        private const int MaxOfBuilder = 10;
+    private const int GCKeepSize = 50;
 
-        internal static StringBuilder Get()
+    private static long Gen;
+
+    private static int CountOfCache = 0;
+
+    private static ConcurrentDictionary<Type, CacheEntry> Cache = new ConcurrentDictionary<Type, CacheEntry>();
+
+    private static IEnumerable<(string Name, MethodInfo Getter, bool IsBool)> GetPropEntriesFromCache(object arg)
+    {
+        var type = arg.GetType();
+        if (Cache.TryGetValue(type, out var cache))
         {
-            if (BuilderPool.TryTake(out var builder))
-            {
-                Interlocked.Decrement(ref CountOfBuilder);
-                builder.Clear();
-            }
-            else
-            {
-                builder = new StringBuilder();
-            }
-            return builder;
+            cache.Gen = Interlocked.Increment(ref Gen);
+            return cache.PropGetters;
         }
 
-        internal static void Return(StringBuilder builder)
+        var propNamesAndGetters = type.GetProperties()
+            .Select(p => (Name: GetHyphenatedName(p.Name), Getter: p.GetGetMethod(), IsBool: p.PropertyType == typeof(bool)))
+            .ToArray();
+        var newCache = new CacheEntry(propNamesAndGetters);
+        newCache.Gen = Interlocked.Increment(ref Gen);
+
+        if (Cache.TryAdd(type, newCache))
         {
-            var count = Interlocked.Increment(ref CountOfBuilder);
-            if (count <= MaxOfBuilder)
+            if (Interlocked.Increment(ref CountOfCache) >= GCThreshold)
             {
-                BuilderPool.Add(builder);
+                lock (Cache)
+                {
+                    var toRemoves = Cache.OrderByDescending(kv => kv.Value.Gen).Skip(GCKeepSize).ToArray();
+                    foreach (var toRemove in toRemoves)
+                    {
+                        if (Cache.TryRemove(toRemove.Key, out var _))
+                            Interlocked.Decrement(ref CountOfCache);
+                    }
+                }
             }
-            else
+        }
+
+        return newCache.PropGetters;
+    }
+
+    private static string GetHyphenatedName(string baseName)
+    {
+        var name = baseName;
+        unsafe
+        {
+            var buff = stackalloc char[name.Length * 2];
+            var isPrevCharUpperCase = false;
+            var j = 0;
+            for (var i = 0; i < name.Length; i++)
             {
-                Interlocked.Decrement(ref CountOfBuilder);
+                var c = name[i];
+
+                if (c == ' ')
+                {
+                    if (i + 1 < name.Length)
+                    {
+                        c = name[++i];
+                        if ('a' <= c && c <= 'z')
+                        {
+                            c = (char)(((byte)c) & ~0x20);
+                        }
+                    }
+                    else continue;
+                }
+
+                if ('A' <= c && c <= 'Z')
+                {
+                    if (!isPrevCharUpperCase && j != 0)
+                    {
+                        buff[j++] = '-';
+                    }
+                    buff[j] = (char)0x20;
+                    isPrevCharUpperCase = true;
+                }
+                else isPrevCharUpperCase = false;
+                buff[j++] |= c;
             }
+
+            var hyphenatedName = new string(buff, 0, j);
+            return hyphenatedName;
+        }
+    }
+}
+
+internal static class StringBuilderPool
+{
+    private static readonly ConcurrentBag<StringBuilder> BuilderPool = new ConcurrentBag<StringBuilder>();
+
+    private static int CountOfBuilder = 0;
+
+    private const int MaxOfBuilder = 10;
+
+    internal static StringBuilder Get()
+    {
+        if (BuilderPool.TryTake(out var builder))
+        {
+            Interlocked.Decrement(ref CountOfBuilder);
+            builder.Clear();
+        }
+        else
+        {
+            builder = new StringBuilder();
+        }
+        return builder;
+    }
+
+    internal static void Return(StringBuilder builder)
+    {
+        var count = Interlocked.Increment(ref CountOfBuilder);
+        if (count <= MaxOfBuilder)
+        {
+            BuilderPool.Add(builder);
+        }
+        else
+        {
+            Interlocked.Decrement(ref CountOfBuilder);
         }
     }
 }
