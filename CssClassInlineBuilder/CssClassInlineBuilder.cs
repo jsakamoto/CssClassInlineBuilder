@@ -12,7 +12,7 @@ public static class CssClassInlineBuilder
     /// <summary>
     /// Build CSS class string from boolean properties of objects in arguments, from strings in arguments.
     /// </summary>
-    public static string CssClass(params object[] args)
+    public static string CssClass(params object?[] args)
     {
         var builder = StringBuilderPool.Get();
         try
@@ -32,13 +32,13 @@ public static class CssClassInlineBuilder
                     _1st = false;
                     builder.Append(GetHyphenatedName(e.ToString()));
                 }
-                else
+                else if (arg is not null)
                 {
                     foreach (var (name, getter, isBool) in GetPropEntriesFromCache(arg))
                     {
                         if (isBool)
                         {
-                            if ((bool)getter.Invoke(arg, null))
+                            if (getter?.Invoke(arg, null) is bool boolValue && boolValue)
                             {
                                 if (!_1st) builder.Append(' ');
                                 _1st = false;
@@ -49,8 +49,8 @@ public static class CssClassInlineBuilder
                         {
                             if (!_1st) builder.Append(' ');
                             _1st = false;
-                            var value = getter.Invoke(arg, null);
-                            builder.Append(name + "-" + GetHyphenatedName(value.ToString()));
+                            var value = getter?.Invoke(arg, null);
+                            builder.Append(name + "-" + GetHyphenatedName(value?.ToString() ?? ""));
                         }
                     }
                 }
@@ -67,8 +67,8 @@ public static class CssClassInlineBuilder
     private class CacheEntry
     {
         public long Gen;
-        public readonly IEnumerable<(string Name, MethodInfo Getter, bool IsBool)> PropGetters;
-        public CacheEntry((string Name, MethodInfo Getter, bool IsBool)[] propGetters) { this.PropGetters = propGetters; }
+        public readonly IEnumerable<(string Name, MethodInfo? Getter, bool IsBool)> PropGetters;
+        public CacheEntry((string Name, MethodInfo? Getter, bool IsBool)[] propGetters) { this.PropGetters = propGetters; }
     }
 
     private const int GCThreshold = 100;
@@ -81,7 +81,7 @@ public static class CssClassInlineBuilder
 
     private static ConcurrentDictionary<Type, CacheEntry> Cache = new ConcurrentDictionary<Type, CacheEntry>();
 
-    private static IEnumerable<(string Name, MethodInfo Getter, bool IsBool)> GetPropEntriesFromCache(object arg)
+    private static IEnumerable<(string Name, MethodInfo? Getter, bool IsBool)> GetPropEntriesFromCache(object arg)
     {
         var type = arg.GetType();
         if (Cache.TryGetValue(type, out var cache))
