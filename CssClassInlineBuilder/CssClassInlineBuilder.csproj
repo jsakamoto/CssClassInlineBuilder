@@ -15,7 +15,7 @@
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <Copyright>Copyright © 2020-2024 J.Sakamoto, Mozilla Public License 2.0</Copyright>
     <Authors>J.Sakamoto</Authors>
-    <Version>3.1.0.0</Version>
+    <Version>3.1.0.1</Version>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <AssemblyName>Toolbelt.Web.CssClassInlineBuilder</AssemblyName>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
@@ -23,6 +23,8 @@
     <Description>Build CSS class string for "class" attribute dynamically based on boolean switch values, in Razor files in-line. (designed for "Blazor")</Description>
     <PackageTags>blazor,cssclasses,cssclass,razor</PackageTags>
     <PackageProjectUrl>https://github.com/jsakamoto/CssClassInlineBuilder</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/jsakamoto/CssClassInlineBuilder</RepositoryUrl>
     <PackageReleaseNotes>(Please write the package release notes in "../RELEASE-NOTES.txt".)</PackageReleaseNotes>
     <PackageIcon>nupkg-icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -33,13 +35,16 @@
     <None Include="..\README.md" Pack="true" Visible="false" PackagePath="\" />
   </ItemGroup>
 
-  <Target Name="PreparePackageReleaseNoteFromFile" BeforeTargets="GenerateNuspec">
+  <Target Name="PreparePackageReleaseNotesFromFile" BeforeTargets="GenerateNuspec">
     <ReadLinesFromFile File="../RELEASE-NOTES.txt">
       <Output TaskParameter="Lines" ItemName="ReleaseNoteLines" />
     </ReadLinesFromFile>
     <PropertyGroup>
-      <PackageReleaseNotes>@(ReleaseNoteLines, '%0a')</PackageReleaseNotes>
+      <PackageReleaseNotes>@(ReleaseNoteLines, '%0a');v.0.0</PackageReleaseNotes>
+      <PackageReleaseNotes>$(PackageReleaseNotes.Replace('&lt;','&amp;lt;'))</PackageReleaseNotes>
+      <PackageReleaseNotes>$(PackageReleaseNotes.Replace('&gt;','&amp;gt;'))</PackageReleaseNotes>
       <PackageReleaseNotes>$([System.Text.RegularExpressions.Regex]::Match($(PackageReleaseNotes), "^(v\.[\d\.]+.+?)v\.[\d\.]+", System.Text.RegularExpressions.RegexOptions.Singleline).Groups[1].Value)</PackageReleaseNotes>
+      <PackageReleaseNotes>$(PackageReleaseNotes)%0a%0aTo see all the change logs, please visit the following URL.%0a- $(RepositoryUrl)/blob/master/RELEASE-NOTES.txt</PackageReleaseNotes>
     </PropertyGroup>
   </Target>
 </Project>
