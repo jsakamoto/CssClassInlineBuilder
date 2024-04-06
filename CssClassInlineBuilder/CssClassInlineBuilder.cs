@@ -7,11 +7,12 @@ namespace Toolbelt.Web;
 /// <summary>
 /// Build CSS class string for "class" attribute dynamically based on boolean switch values.
 /// </summary>
-public static class CssClassInlineBuilder
+public static partial class CssClassInlineBuilder
 {
     /// <summary>
     /// Build CSS class string from boolean properties of objects in arguments, from strings in arguments.
     /// </summary>
+    [Obsolete("Use \"CssClassInlineBuilder.V2.CssClass()\" instead since this method is incompatible with IL trimming.")]
     public static string CssClass(params object?[] args)
     {
         var builder = StringBuilderPool.Get();
