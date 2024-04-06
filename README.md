@@ -1,8 +1,8 @@
-# CSS Class Inline Builder (designed for Blazor) [![NuGet Package](https://img.shields.io/nuget/v/Toolbelt.Web.CssClassInlineBuilder.svg)](https://www.nuget.org/packages/Toolbelt.Web.CssClassInlineBuilder/)
+# CSS Class Inline Builder (designed for Blazor) [![NuGet Package](https://img.shields.io/nuget/v/Toolbelt.Web.CssClassInlineBuilder.svg)](https://www.nuget.org/packages/Toolbelt.Web.CssClassInlineBuilder/) [![unit tests](https://github.com/jsakamoto/CssClassInlineBuilder/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/jsakamoto/CssClassInlineBuilder/actions/workflows/unit-tests.yml)
 
 ## Summary
 
-Build CSS class string for "class" attribute dynamically based on boolean switch and enum values, in Razor files in-line.
+Build CSS class string for a "class" attribute dynamically based on the boolean switch and enum values in Razor files in-line.
 
 ![fig1](https://raw.githubusercontent.com/jsakamoto/CssClassInlineBuilder/master/assets/fig1.png)
 
@@ -24,12 +24,12 @@ $ dotnet add package Toolbelt.Web.CssClassInlineBuilder
 
 ### 2. Declare for using "CSS class inline builder".
 
-Add `@using static Toolbelt.Web.CssClassInlineBuilder` declaration in head of each `.razor` file which you want to use CSS class inline builder.
+Add `@using static Toolbelt.Web.CssClassInlineBuilder.V2` declaration in the head of each `.razor` file where you want to use the CSS class inline builder.
 
-You can also add the declaration in `_Imports.razor` once, instead.
+Or you can also add the declaration to `_Imports.razor` once instead.
 
 ```csharp
-@using static Toolbelt.Web.CssClassInlineBuilder
+@using static Toolbelt.Web.CssClassInlineBuilder.V2
 ```
 
 ### 3. Use "CssClass(...)" method to build  CSS class string!
@@ -38,31 +38,31 @@ You can use the `CssClass(...)` method anywhere you want to build a CSS class st
 
 #### 3-1. CSS class name strings
 
-Basically, you can pass any number of CSS class name strings to the arguments of `CssClass()` method.
+Basically, you can pass CSS class name strings up to 4 to the arguments of `CssClass()` method.
 
 The `CssClass()` method returns a string that is concatenated with all of those passed to argument strings with a space separator.
 
 ```html
 <div class="@CssClass("foo", "bar")">
-<!-- You will be got `class="foo bar"` -->
+<!-- You will get `class="foo bar"` -->
 ```
 
 #### 3-2. objects which has `bool` properties
 
-Next, you can pass any number of objects (include anonymous type) that contains `bool` properties to the arguments of the `CssClass()` method.
+Next, you can pass objects (including anonymous types) up to 4 that contain `bool` properties to the arguments of the `CssClass()` method.
 
-The `CssClass()` method picks up the `bool` properties of argument objects which it values is `true`, and concatenate those property's name strings with space separator, and return it. (The name of properties are converted lowercase.)
+The `CssClass()` method picks up the `bool` properties where its value is `true` from the argument objects, concatenates those property's name strings with a space separator, and returns them. (The names of properties are converted to lowercase.)
 
 ```html
 <div class="@CssClass(new {Foo=true, Bar=false}, new {Fizz=true})">
-<!-- You will be got `class="foo fizz"` -->
+<!-- You will get `class="foo fizz"` -->
 ```
 
-As you know, the anonymous type can omit explicit property names if the name is the same with a variable name.
+As you know, the anonymous type can omit explicit property names when the name is the same as a variable name.
 
 ```html
 <div class="@CssClass(new {Foo, Bar}, new {Fizz})">
-<!-- You will be got `class="bar fizz"` -->
+<!-- You will get `class="bar fizz"` -->
 @code {
   private bool Foo = false;
   private bool Bar = true;
@@ -70,11 +70,11 @@ As you know, the anonymous type can omit explicit property names if the name is 
   ...
 ```
 
-The property name will be converted from camel case/snake case naming convention to hyphenated lower case.
+The property name will be converted from a camel/snake case naming convention to a hyphenated lowercase.
 
 ```html
 <div class="@CssClass(new {FizzBuzz})">
-<!-- You will be got `class="fizz-buzz"` -->
+<!-- You will get `class="fizz-buzz"` -->
 @code {
   private bool FizzBuzz = true;
   ...
@@ -82,8 +82,8 @@ The property name will be converted from camel case/snake case naming convention
 
 #### 3-3. any other type properties in an object
 
-If you pass an object with non-boolean type properties, a CSS class name will be built for each of those properties.  
-That CSS class name will be concatenated with a hyphen of the property name and its property value.
+If you pass an object with non-boolean-type properties, a CSS class name will be built for each property.  
+That CSS class name will be concatenated with a hyphen of the property name and its value.
 
 ```html
 @code {
@@ -92,16 +92,16 @@ That CSS class name will be concatenated with a hyphen of the property name and 
 }
 
 <div class="@CssClass(new {NumberOfStars = this.Stars})">
-<!-- You will be got `class="number-of-stars-5"` -->
+<!-- You will get `class="number-of-stars-5"` -->
 ```
 
 #### 3-4. enum values
 
-You can also pass any number of enum values to the arguments of the `CssClass()` method.
+You can also pass enum values up to 4 to the arguments of the `CssClass()` method.
 
-The enum value will be converted to a string to use as a CSS class name.
+The enum value will be converted to a string as a CSS class name.
 
-The name of enum value will be converted from camel case/snake case naming convention to hyphenated lower case.
+The name of the enum value will be converted from camel case/snake case naming convention to hyphenated lower case.
 
 ```html
 @code {
@@ -116,7 +116,7 @@ The name of enum value will be converted from camel case/snake case naming conve
 }
 
 <div class="@CssClass(this.State)">
-<!-- You will be got `class="not-ready"` -->
+<!-- You will get `class="not-ready"` -->
 ```
 
 #### Finally, you can mix those all!
@@ -139,14 +139,14 @@ You can pass mixing strings, objects, and enum values to the argument of the `Cs
 }
 ...
 <div class="@CssClass(new {Fizz, Buzz}, $"stars-{NumOfStars}", State)">
-<!-- You will be got `class="fizz stars-5 complete"` -->
+<!-- You will get `class="fizz stars-5 complete"` -->
 ```
 
 ## Notice
 
 The `CssClass()` method uses the .NET CLR "Reflection" feature to parse the object's properties.
 
-This means that using the `CssClass()` method can degrade performance.
+This means using the `CssClass()` method can degrade performance.
 
 The `CssClass()` method includes a caching mechanism to avoid performance degradation, but it will be better to let you know this information anyway.
 

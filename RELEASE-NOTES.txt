@@ -1,3 +1,8 @@
+v.3.0.0
+- [Breaking Change] Change the target framework to be .NET 6 or later.
+- Improve: Add the "CssClassInlineBuilder.V2" to make it compatible with IL trimming.
+  - The "CssClassInlineBuilder" is deprecated.
+
 v.2.0.0
 - [Breaking Change] Add support for non-boolean type properties in an object.
 
