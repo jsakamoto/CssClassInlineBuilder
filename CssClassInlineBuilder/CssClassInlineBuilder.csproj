@@ -15,7 +15,7 @@
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <Copyright>Copyright © 2020-2024 J.Sakamoto, Mozilla Public License 2.0</Copyright>
     <Authors>J.Sakamoto</Authors>
-    <Version>3.0.0.0</Version>
+    <Version>3.1.0.0</Version>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <AssemblyName>Toolbelt.Web.CssClassInlineBuilder</AssemblyName>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>

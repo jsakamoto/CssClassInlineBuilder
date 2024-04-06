@@ -1,3 +1,6 @@
+v.3.1.0
+- Mark as trimmable.
+
 v.3.0.0
 - [Breaking Change] Change the target framework to be .NET 6 or later.
 - Improve: Add the "CssClassInlineBuilder.V2" to make it compatible with IL trimming.
